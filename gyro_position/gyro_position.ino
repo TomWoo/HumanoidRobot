@@ -22,8 +22,8 @@ char itgAddress = 0x69;
 
 void setup()
 {
+  
    Serial.begin(9600);
- 
    Wire.begin();
  
     char id=0;
@@ -117,6 +117,7 @@ void loop()
   Serial.print("Z axis angle = ");
   Serial.print(Z);
   Serial.println();   
+  delay(70);
 }
 
 
