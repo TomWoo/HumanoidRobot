@@ -2,6 +2,7 @@
 
 #include <Wire.h>
 
+int counter=0;
 char WHO_AM_I = 0x00;
 char SMPLRT_DIV= 0x15;
 char DLPF_FS = 0x16;
@@ -22,7 +23,14 @@ char itgAddress = 0x69;
 
 void setup()
 {
-  
+  counter++;
+  if( angleX>xMaxTolerance & angleX<xMinTolerance & angleY>yMaxTolerance & angleY<yMinTolerance & angleZ>zMaxTolerance & angleZ<zMinTolerance){
+    if(counter == counterPref){
+    xAxis = 0;
+    yAxis = 0;
+    zAxis = 0;
+    }
+  }
    Serial.begin(9600);
    Wire.begin();
  
