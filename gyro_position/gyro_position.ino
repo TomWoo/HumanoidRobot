@@ -2,7 +2,7 @@
 
 #include <Wire.h>
 
-int counter=0;
+
 char WHO_AM_I = 0x00;
 char SMPLRT_DIV= 0x15;
 char DLPF_FS = 0x16;
@@ -21,16 +21,12 @@ char DLPF_FS_SEL_1 = (1<<4);
 
 char itgAddress = 0x69;
 
+
+
 void setup()
 {
-  counter++;
-  if( angleX>xMaxTolerance & angleX<xMinTolerance & angleY>yMaxTolerance & angleY<yMinTolerance & angleZ>zMaxTolerance & angleZ<zMinTolerance){
-    if(counter == counterPref){
-    xAxis = 0;
-    yAxis = 0;
-    zAxis = 0;
-    }
-  }
+  int counter=0;
+int maxV=1000000;
    Serial.begin(9600);
    Wire.begin();
  
@@ -40,8 +36,17 @@ void setup()
  
     itgWrite(itgAddress, DLPF_FS, (DLPF_FS_SEL_0|DLPF_FS_SEL_1|DLPF_CFG_0));
    itgWrite(itgAddress, SMPLRT_DIV, 9);
-}
 
+int  prevX[5]={maxV,maxV,maxV,maxV,maxV};
+int  prevY[5]={maxV,maxV,maxV,maxV,maxV};
+int  prevZ[5]={maxV,maxV,maxV,maxV,maxV};
+  int xMinTolerance=4;
+  int xMaxTolerance=-4;
+  int yMinTolerance=4;
+  int yMaxTolerance=-4;
+  int zMinTolerance=4;
+  int zMaxTolerance=-4;
+  int counter =50;
     int xRate;
     int yRate;
     int zRate;
@@ -64,9 +69,20 @@ void setup()
      float Z=0;
                 // change this number to make it more accurate
                 int calibrationFactor=7200;
-             
+   }          
 void loop()
 {
+    counter++;
+    if(
+      if( angleX>xMaxTolerance & angleX<xMinTolerance & angleY>yMaxTolerance & angleY<yMinTolerance & angleZ>zMaxTolerance & angleZ<zMinTolerance){
+        if(counter == counterPref && checkPrev(angleX,angleY,angleZ)){
+          xAxis = 0;
+          yAxis = 0;
+          zAxis = 0;
+          counter=0;
+        }
+    }
+  
        if (flag==1)
        {
               for (int i=1;i<10;i++)
@@ -124,8 +140,36 @@ void loop()
   Serial.print("\t\t");
   Serial.print("Z axis angle = ");
   Serial.print(Z);
-  Serial.println();   
+  Serial.println();  
+  addPrev(angleX, angleY, angleZ); 
   delay(70);
+}
+
+boolean checkPrev(int x, int y, int z){
+  for(k=0;k<sizeof(prevX);k++){
+    if(prevX[k]==x && prevY[k]==y && prevZ[k]==z){
+      return false;
+    }
+  }
+  return true;
+}
+
+void addPrev(int x, int y, int z){
+  add(prevX,x);
+  add(prevY,y);
+  add(prevZ,z);
+}
+
+int[] add(int[] x, int value){
+  boolean lol =false;
+  for(k=0;k<sizeof(x);k++){
+    if(x[k]==maxV){
+      x[k]=value;
+      return x;
+    }
+  }
+  x[0]=value;
+  return x;
 }
 
 
